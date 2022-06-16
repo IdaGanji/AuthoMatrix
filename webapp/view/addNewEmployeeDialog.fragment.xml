@@ -1,0 +1,58 @@
+<core:FragmentDefinition 
+	xmlns="sap.m" 
+	xmlns:semantic="sap.f.semantic" 
+	xmlns:core="sap.ui.core" 
+	xmlns:l="sap.ui.layout" 
+	xmlns:f="sap.f" 
+	xmlns:form="sap.ui.layout.form">
+	<Dialog 
+		id="newEmployeeDialog" 
+		draggable="true"
+		title="Add role"
+        afterClose=".onAfterClose">
+		<form:SimpleForm id="employeeRoleForm" editable="false" layout="ResponsiveGridLayout" columnsM="1" columnsL="1" columnsXL="1" emptySpanL="2" labelSpanL="2" >
+			<form:content>
+				<Label 
+					text="Role"
+					id="employeeLabel"/>
+				<Input 
+					id="rolesInput"
+					placeholder="Enter role name..." 
+					type="Text" 
+                    value="{roleDataModel>/Role}"/>
+				<Label text="Role Description"/>
+				<Input 
+					id="roleDescriptionInput" 
+					placeholder="Enter role description..."  
+					type="Text" 
+					value="{roleDataModel>/RoleDescription}"/>
+                <Label text="Max Amount"/>
+				<Input 
+					id="amountInput" 
+					placeholder="Enter maximum amount..."  
+					type="Text" 
+					value="{roleDataModel>/Amount}"/>
+                <Label text="Currency"/>
+				<Input 
+					id="currencyInput" 
+					placeholder="Select currency..."  
+					type="Text"
+                    showValueHelp="true"
+                    valueHelpRequest="onCurrencyValueHelp" 
+					value="{roleDataModel>/Currency}"/>
+			</form:content>
+		</form:SimpleForm>
+			<buttons>
+				<Button 
+					press=".onAddNewEmployee" 
+					text="Add" 
+                    type="Emphasized"
+					id="createNewEmployeeButton"
+					/>
+				<Button 
+					press=".onEmployeeDialogClose" 
+					text="Cancel"
+					/>
+			</buttons>
+	</Dialog>
+</core:FragmentDefinition>

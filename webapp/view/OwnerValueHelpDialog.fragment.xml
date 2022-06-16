@@ -1,0 +1,14 @@
+
+<core:FragmentDefinition
+	xmlns="sap.ui.comp.valuehelpdialog"
+	xmlns:core="sap.ui.core">
+	<ValueHelpDialog
+		title="{i18n>owners}"
+		ok=".onOwnerValueHelpOkPress"
+		cancel=".onOwnerValueHelpCancelPress"
+		afterClose=".onOwnerValueHelpAfterClose"
+		key="Roleowner"
+		descriptionKey="RoleownerName"
+	>
+	</ValueHelpDialog>
+</core:FragmentDefinition>

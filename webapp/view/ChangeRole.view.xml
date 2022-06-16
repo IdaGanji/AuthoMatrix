@@ -1,0 +1,198 @@
+<mvc:View
+		controllerName="zfiauthomatrix.controller.ChangeRole"
+		xmlns:mvc="sap.ui.core.mvc"
+		xmlns="sap.m"
+		xmlns:f="sap.f"
+		xmlns:layout="sap.ui.layout"
+        xmlns:fb="sap.ui.comp.filterbar"
+        xmlns:core="sap.ui.core"
+		height="100%"
+        displayBlock="true">
+		<f:DynamicPage id="mainPage" headerExpanded="{/headerExpanded}" toggleHeaderOnTitleClick="{/titleClickable}" showFooter="true">
+			<!-- DynamicPage Title -->
+			<f:title>
+				<f:DynamicPageTitle>
+					<f:heading>
+						<Title text="{i18n>title}"/>
+					</f:heading>
+					<f:breadcrumbs>
+						<Breadcrumbs>
+							<Link text="{i18n>furtherNav1}" />
+							<Link text="{i18n>furtherNav2}" />
+						</Breadcrumbs>
+					</f:breadcrumbs>
+					<!-- <f:expandedContent>
+						<Label text="This is a subheading"/>
+					</f:expandedContent>
+					<f:snappedContent>
+						<Label text="This is a subheading"/>
+					</f:snappedContent> -->
+					<!-- <f:snappedTitleOnMobile>
+						<Title text="This is a subheading"/>
+					</f:snappedTitleOnMobile> -->
+					<!-- <f:content>
+						<OverflowToolbar>
+							<GenericTag text="SR"
+								status="Error"
+								press="onPressOpenPopover"
+								design="StatusIconHidden">
+								<ObjectNumber number="2"
+									unit="M"
+									emphasized="false"
+									state="Error"/>
+							</GenericTag>
+						</OverflowToolbar>
+					</f:content> -->
+					<!-- <f:actions>
+						<Button
+								text="Edit"
+								type="Emphasized"
+								press="toggleAreaPriority"/>
+						<Button
+								text="Delete"
+								type="Transparent"/>
+						<Button
+								text="Copy"
+								type="Transparent"/>
+						<Button
+								text="Toggle Footer"
+								type="Transparent"
+								press="onToggleFooter"/>
+						<Button
+								icon="sap-icon://action"
+								type="Transparent"/>
+						<Button
+								text="Button with layoutData"
+								type="Transparent"
+								press="onPressOpenPopover">
+							<layoutData>
+								<OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
+							</layoutData>
+						</Button>
+					</f:actions> -->
+					<f:navigationActions>
+						<Button
+								icon="sap-icon://full-screen"
+								type="Transparent" />
+						<Button
+								icon="sap-icon://exit-full-screen"
+								type="Transparent" />
+						<Button
+								icon="sap-icon://decline"
+								type="Transparent" />
+					</f:navigationActions>
+				</f:DynamicPageTitle>
+			</f:title>
+			<!-- DynamicPage Header -->
+			<f:header>
+				<f:DynamicPageHeader pinnable="true">
+					<!-- <layout:HorizontalLayout allowWrapping="true"> -->
+                        
+                
+					<!-- </layout:HorizontalLayout> -->
+				</f:DynamicPageHeader>
+			</f:header>
+			<f:content>
+				<Table id="idTable"
+						sticky="HeaderToolbar,ColumnHeaders"
+						inset="false"
+						items="{
+							path: 'mainModel>/results',
+							sorter: {
+								path: 'Role'
+							}
+						}"
+					   class="sapFDynamicPageAlignContent"
+					   width="auto"
+                       growing="true"
+                       growingThreshold="20"
+                       mode="MultiSelect"
+                       selectionChange="onItemsSelected"
+                       >
+					<!-- <headerToolbar>
+						<Toolbar>
+							<Title text="Products" level="H2"/>
+						</Toolbar>
+					</headerToolbar> -->
+					<columns>
+						<Column id="roleColumn">
+							<Text text="{i18n>role}" />
+						</Column>
+						<!-- <Column id="roleDescColumn" >
+							<Text text="{i18n>roleDes}" />
+						</Column> -->
+						<Column id="roleOwnerColumn">
+							<Text text="{i18n>roleOwner}" />
+						</Column>
+						<Column id="amountColumn">
+							<Text text="{i18n>amount}" />
+						</Column>
+                        <Column id="startDateColumn">
+							<Text text="{i18n>startDate}" />
+						</Column>
+                        <Column id="endDateColumn">
+							<Text text="{i18n>endDate}" />
+						</Column>
+                        <Column id="statusColumn">
+							<Text text="{i18n>status}" />
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+                                <!-- <Text
+                                        text="{mainModel>Role}" />
+								<Text
+										text="{mainModel>Roledescription}" /> -->
+                                <ObjectIdentifier title="{mainModel>Role}" text="{mainModel>Roledescription}"/>
+								<!-- <Text
+										text="{mainModel>Roleowner}" /> -->
+                                <ObjectIdentifier title="{mainModel>Roleowner}" text="{mainModel>RoleownerName}"/>
+								<ObjectNumber
+										number="{
+											parts:[{path:'mainModel>Maxamount'},{path:'mainModel>Currency'}],
+											type: 'sap.ui.model.type.Currency',
+											formatOptions: {showMeasure: false}
+										}"
+										unit="{mainModel>Currency}" />
+                                <ObjectNumber
+										number="{
+											path:'mainModel>Startdate',
+											type: 'sap.ui.model.type.Date',
+											formatOptions: {pattern: 'yyyy-MM-dd'}
+										}" />
+                                <ObjectNumber
+										number="{
+											path:'mainModel>Enddate',
+											type: 'sap.ui.model.type.Date',
+											formatOptions: {pattern: 'yyyy-MM-dd'}
+										}" /> 
+                                 <!-- <Text
+										text="{
+                                            path: 'mainModel>Status',
+                                            formatter: '.formatter.statusText'}" /> -->
+                                <ObjectStatus
+                                        text="{
+                                            path: 'mainModel>Status',
+                                            formatter: '.formatter.statusText'}"
+                                        icon="{
+                                            path: 'mainModel>Status',
+                                            formatter: '.formatter.statusIcon'}" 
+                                        state="{
+                                            path: 'mainModel>Status',
+                                            formatter: '.formatter.statusColor'}" />
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</f:content>
+			<!-- DynamicPage Footer -->
+			<f:footer>
+				<OverflowToolbar>
+					<ToolbarSpacer/>
+					<Button type="Emphasized" text="{i18n>createnewrole}" press=".onPressNewRole"/>
+					<Button type="Emphasized" text="{i18n>changeselectedroles}" press=".onPressEdit"/>
+				</OverflowToolbar>
+			</f:footer>
+		</f:DynamicPage>
+</mvc:View>
