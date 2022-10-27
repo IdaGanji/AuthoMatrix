@@ -9,87 +9,13 @@
 		height="100%"
         displayBlock="true">
 		<f:DynamicPage id="mainPage" headerExpanded="{/headerExpanded}" toggleHeaderOnTitleClick="{/titleClickable}" showFooter="true">
-			<!-- DynamicPage Title -->
-			<f:title>
-				<f:DynamicPageTitle>
-					<f:heading>
-						<Title text="{i18n>title}"/>
-					</f:heading>
-					<f:breadcrumbs>
-						<Breadcrumbs>
-							<Link text="{i18n>furtherNav1}" />
-							<Link text="{i18n>furtherNav2}" />
-						</Breadcrumbs>
-					</f:breadcrumbs>
-					<!-- <f:expandedContent>
-						<Label text="This is a subheading"/>
-					</f:expandedContent>
-					<f:snappedContent>
-						<Label text="This is a subheading"/>
-					</f:snappedContent> -->
-					<!-- <f:snappedTitleOnMobile>
-						<Title text="This is a subheading"/>
-					</f:snappedTitleOnMobile> -->
-					<!-- <f:content>
-						<OverflowToolbar>
-							<GenericTag text="SR"
-								status="Error"
-								press="onPressOpenPopover"
-								design="StatusIconHidden">
-								<ObjectNumber number="2"
-									unit="M"
-									emphasized="false"
-									state="Error"/>
-							</GenericTag>
-						</OverflowToolbar>
-					</f:content> -->
-					<!-- <f:actions>
-						<Button
-								text="Edit"
-								type="Emphasized"
-								press="toggleAreaPriority"/>
-						<Button
-								text="Delete"
-								type="Transparent"/>
-						<Button
-								text="Copy"
-								type="Transparent"/>
-						<Button
-								text="Toggle Footer"
-								type="Transparent"
-								press="onToggleFooter"/>
-						<Button
-								icon="sap-icon://action"
-								type="Transparent"/>
-						<Button
-								text="Button with layoutData"
-								type="Transparent"
-								press="onPressOpenPopover">
-							<layoutData>
-								<OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
-							</layoutData>
-						</Button>
-					</f:actions> -->
-					<f:navigationActions>
-						<Button
-								icon="sap-icon://full-screen"
-								type="Transparent" />
-						<Button
-								icon="sap-icon://exit-full-screen"
-								type="Transparent" />
-						<Button
-								icon="sap-icon://decline"
-								type="Transparent" />
-					</f:navigationActions>
-				</f:DynamicPageTitle>
-			</f:title>
-			<!-- DynamicPage Header -->
+
 			<f:header>
 				<f:DynamicPageHeader pinnable="true">
 					<!-- <layout:HorizontalLayout allowWrapping="true"> -->
                         <fb:FilterBar reset="onReset" search="onSearch" showRestoreButton="true" showClearOnFB="true" clear="onClear">
                             <fb:filterGroupItems>
-                                <fb:FilterGroupItem groupName="__$INTERNAL$" name="role" label="{i18n>role}" partOfCurrentVariant="true" visibleInFilterBar="true">
+                                <fb:FilterGroupItem groupName="__$INTERNAL$" name="role" label="{i18n>role}" visibleInFilterBar="true">
                                     <fb:control>
                                         <MultiInput
                                             id="roleInput"
@@ -97,9 +23,11 @@
                                             showSuggestion="true"
                                             showValueHelp="true"
                                             valueHelpRequest=".onRoleValueHelpRequest"
+                                            valueHelpOnly="true"
                                             suggestionItems="{mainModel>/results}"
                                             tokens="{filterModel>/role}"
-                                            value="{filterModel>/role/key}">
+                                            value="{filterModel>/role/key}"
+                                            tokenUpdate="onRoleInputChange">
                                             <tokens>
                                                <Token  key="{filterModel>key}" text="{filterModel>text}"/>
                                             </tokens>
@@ -109,17 +37,19 @@
                                         </MultiInput>
                                     </fb:control>
                                 </fb:FilterGroupItem>
-                                <fb:FilterGroupItem groupName="__$INTERNAL$" name="roleOwner" label="{i18n>roleOwner}" partOfCurrentVariant="true" visibleInFilterBar="true">
+                                <fb:FilterGroupItem groupName="__$INTERNAL$" name="roleOwner" label="{i18n>roleOwner}" visibleInFilterBar="true" >
                                     <fb:control>
                                        <MultiInput
                                                 id="ownerSelect"
                                                 placeholder="{i18n>searchforroleowner}"
                                                 showSuggestion="true"
                                                 showValueHelp="true"
+                                                valueHelpOnly="true"
                                                 valueHelpRequest=".onOwnerValueHelpRequest"
                                                 suggestionItems="{mainModel>/results}"
                                                 tokens="{filterModel>/owner}"
-                                                value="{filterModel>/owner/key}">
+                                                value="{filterModel>/owner/key}"
+                                                tokenUpdate="onOwnerInputChange">
                                                 <suggestionItems>
                                                     <core:Item text="{mainModel>Roleowner}" />
                                                 </suggestionItems>
@@ -129,12 +59,13 @@
                                             </MultiInput>
                                     </fb:control>
                                 </fb:FilterGroupItem>
-                                <fb:FilterGroupItem groupName="__$INTERNAL$" name="status" label="{i18n>status}" partOfCurrentVariant="true" visibleInFilterBar="true">
+                                <fb:FilterGroupItem groupName="__$INTERNAL$" name="status" label="{i18n>status}"  visibleInFilterBar="true">
                                     <fb:control>
                                         <Select forceSelection="false" selectedKey="{filterModel>/status}" id="statusSelect">
                                             <core:Item key="{i18n>actKey}" text="{i18n>act}" />
                                             <core:Item key="{i18n>delKey}" text="{i18n>del}" />
                                             <core:Item key="{i18n>penKey}" text="{i18n>pen}" />
+                                            <core:Item key="{i18n>allKey}" text="" />
                                         </Select>
                                     </fb:control>
                                 </fb:FilterGroupItem>
@@ -208,13 +139,13 @@
 										number="{
 											path:'mainModel>Startdate',
 											type: 'sap.ui.model.type.Date',
-											formatOptions: {pattern: 'yyyy-MM-dd'}
+											formatOptions: {pattern: 'dd/MM/yyyy', UTC: true}
 										}" />
                                 <ObjectNumber
 										number="{
 											path:'mainModel>Enddate',
 											type: 'sap.ui.model.type.Date',
-											formatOptions: {pattern: 'yyyy-MM-dd'}
+											formatOptions: {pattern: 'dd/MM/yyyy', UTC: true}
 										}"/> 
                                  
                                 <ObjectStatus

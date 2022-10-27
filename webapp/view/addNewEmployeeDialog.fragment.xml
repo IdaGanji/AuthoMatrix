@@ -19,27 +19,25 @@
 					id="rolesInput"
 					placeholder="Enter role name..." 
 					type="Text" 
-                    value="{roleDataModel>/Role}"/>
+                    value="{newRole>/Role}"/>
 				<Label text="Role Description"/>
 				<Input 
 					id="roleDescriptionInput" 
 					placeholder="Enter role description..."  
 					type="Text" 
-					value="{roleDataModel>/RoleDescription}"/>
+					value="{newRole>/RoleDescription}"/>
                 <Label text="Max Amount"/>
 				<Input 
 					id="amountInput" 
-					placeholder="Enter maximum amount..."  
-					type="Text" 
-					value="{roleDataModel>/Amount}"/>
+                    change=".onAmountInputEnter"
+					placeholder="Enter maximum amount..."   
+                    value="{path:'newRole>/Amount', type:'sap.ui.model.type.Decimal()'}"/>
                 <Label text="Currency"/>
 				<Input 
-					id="currencyInput" 
-					placeholder="Select currency..."  
+					id="currencyInput"   
 					type="Text"
-                    showValueHelp="true"
-                    valueHelpRequest="onCurrencyValueHelp" 
-					value="{roleDataModel>/Currency}"/>
+                    editable="false" 
+					value="{newRole>/Currency}"/>
 			</form:content>
 		</form:SimpleForm>
 			<buttons>
@@ -51,7 +49,7 @@
 					/>
 				<Button 
 					press=".onEmployeeDialogClose" 
-					text="Cancel"
+					text="Close"
 					/>
 			</buttons>
 	</Dialog>

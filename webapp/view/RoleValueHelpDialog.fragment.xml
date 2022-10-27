@@ -1,13 +1,40 @@
 <core:FragmentDefinition
 	xmlns="sap.ui.comp.valuehelpdialog"
-	xmlns:core="sap.ui.core">
+	xmlns:core="sap.ui.core"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar">
 	<ValueHelpDialog
 		title="{i18n>roles}"
 		ok=".onRoleValueHelpOkPress"
 		cancel=".onRoleValueHelpCancelPress"
 		afterClose=".onRoleValueHelpAfterClose"
 		key="Role"
-		descriptionKey="Roledescription"
+		descriptionKey="RoleDescription"
 	>
+    <filterBar>
+			<fb:FilterBar advancedMode="true" search=".onRoleFilterBarSearch" isRunningInValueHelpDialog="true">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+						groupName="__$INTERNAL$"
+						name="Role"
+						label="Role"
+						visibleInFilterBar="true">
+						<fb:control>
+							<m:Input name="Role" placeholder="Search For Role"/>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
+						groupName="__$INTERNAL$"
+						name="RoleDescription"
+						label="Role Description"
+						visibleInFilterBar="true">
+						<fb:control>
+							<m:Input name="RoleDescription" placeholder=" Search For Role Description" />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+		</filterBar>
 	</ValueHelpDialog>
 </core:FragmentDefinition>
+

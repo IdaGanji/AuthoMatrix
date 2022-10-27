@@ -1,14 +1,40 @@
 
 <core:FragmentDefinition
 	xmlns="sap.ui.comp.valuehelpdialog"
-	xmlns:core="sap.ui.core">
+	xmlns:core="sap.ui.core"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar">
 	<ValueHelpDialog
 		title="{i18n>owners}"
 		ok=".onOwnerValueHelpOkPress"
 		cancel=".onOwnerValueHelpCancelPress"
 		afterClose=".onOwnerValueHelpAfterClose"
-		key="Roleowner"
-		descriptionKey="RoleownerName"
+		key="UserName"
+		descriptionKey="FullName"
 	>
+    <filterBar>
+			<fb:FilterBar advancedMode="true" search=".onOwnerFilterBarSearch" isRunningInValueHelpDialog="true">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+						groupName="__$INTERNALs$"
+						name="UserName"
+						label="User Name"
+						visibleInFilterBar="true">
+						<fb:control>
+							<m:Input name="UserName" placeholder="Search For User Name"/>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
+						groupName="__$INTERNALs$"
+						name="FullName"
+						label="Full Name"
+						visibleInFilterBar="true">
+						<fb:control>
+							<m:Input name="FullName" placeholder=" Search For Full Name" />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+		</filterBar>
 	</ValueHelpDialog>
 </core:FragmentDefinition>

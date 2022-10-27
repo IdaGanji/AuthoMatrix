@@ -9,9 +9,11 @@ sap.ui.define(
         "sap/ui/model/Filter",
         "sap/ui/model/FilterOperator",
         "zfiauthomatrix/utils/formatter",
-        "sap/ui/core/format/DateFormat"
+        "sap/ui/core/format/DateFormat",
+        "sap/m/MessageToast",
+        "sap/m/SearchField"
     ],
-    function(Controller,service,JSONModel,errorHandler,MessageBox,Fragment,Filter,FilterOperator,formatter,DateFormat) {
+    function(Controller,service,JSONModel,errorHandler,MessageBox,Fragment,Filter,FilterOperator,formatter,DateFormat,MessageToast,SearchField) {
       "use strict";
   
       return Controller.extend("zfiauthomatrix.controller.App", {
@@ -19,13 +21,12 @@ sap.ui.define(
         onInit() {
             this.initFilterModel();
             this.setColomnsModel();
-           // this.getTableData();
             this.setNewRoleData();
-            this.getCurrencyData();
-
+            this.getRoleValueData();
+            this.getOwnerValueData();
         },
-        getTableData:function(){
-            service.get("/POAAuthMatrixSet").then(
+        getTableData:function(aFilters){
+            service.get("/POAAuthMatrixSet",aFilters).then(
                 function(oData) {
                      this.setJSONModel(oData, "mainModel");
                 }.bind(this)).then(undefined,
@@ -40,15 +41,27 @@ sap.ui.define(
 				Role: "",
 				RoleDescription: "",
 				Amount:"",
-                Currency:""
+                Currency:"USD"
 			};
             this.setJSONModel(newData,"newRole");
 
         },
-        getCurrencyData:function(){
-            service.get("/Z_I_POACurrency").then(
+        getRoleValueData:function(){
+            service.get("/Z_I_POARole").then(
                 function(oData) {
-                     this.setJSONModel(oData, "currencyModel");
+                     this.setFilterJSONModel(oData, "RoleValueHelpModel");
+                }.bind(this)).then(undefined,
+                function(oError) {
+        
+                    this.showErrorMessage(oError);
+                 
+                }.bind(this));
+
+        },
+        getOwnerValueData:function(){
+            service.get("/RoleOwnersVH").then(
+                function(oData) {
+                     this.setJSONModel(oData, "OwnerValueHelpModel");
                 }.bind(this)).then(undefined,
                 function(oError) {
         
@@ -110,12 +123,17 @@ sap.ui.define(
             var oModel = new JSONModel();
             oModel.setDefaultBindingMode(sap.ui.model.BindingMode.TwoWay);
             oModel.setData(oData);
+            return this.getOwnerComponent().setModel(oModel, sName);
+        },
+        setFilterJSONModel: function (oData, sName) {
+            var oModel = new JSONModel();
+            oModel.setData(oData);
             return this.getView().setModel(oModel, sName);
         },
         showErrorMessage: function(oError) {
             var errorDetails = errorHandler.parseError(oError);
             
-            MessageBox.error(errorDetails.message, {
+            MessageBox.error("Do not leave space between numbers", {
                 icon:		MessageBox.Icon.ERROR,
                  title:		this.geti18nString("error"),
                 details:	errorDetails.details,
@@ -136,7 +154,7 @@ sap.ui.define(
                    },
                    {
                        "label": "Role Description",
-                       "template": "Roledescription"
+                       "template": "RoleDescription"
                    }
                ]
            };
@@ -145,13 +163,13 @@ sap.ui.define(
             "cols": [
                 {
                     "label": "User Name",
-                    "template": "Roleowner",
+                    "template": "UserName",
                     "width": "15rem"
                 
                 },
                 {
                     "label": "Full Name",
-                    "template": "RoleownerName"
+                    "template": "FullName"
                 }
             ]
         };
@@ -160,8 +178,12 @@ sap.ui.define(
 
     onRoleValueHelpRequest: function() {
         var aCols = this.oColModel.getData().cols,
-         oModel=this.getView().getModel("mainModel"),
+         oModel=this.getView().getModel("RoleValueHelpModel"),
          oMultiInput=this.getView().byId("roleInput");
+         this._oRoleSearchField = new SearchField({
+            showSearchButton: false,
+            placeholder: "Search in both Role and Role Description"
+        });
 
         Fragment.load({
             name: "zfiauthomatrix.view.RoleValueHelpDialog",
@@ -169,6 +191,8 @@ sap.ui.define(
         }).then(function(oValueHelpDialog) {
             this._RoleValueHelpDialog = oValueHelpDialog;
             this.getView().addDependent(this._RoleValueHelpDialog);
+            var oFilterBar = this._RoleValueHelpDialog.getFilterBar();
+            oFilterBar.setBasicSearch(this._oRoleSearchField);
 
             this._RoleValueHelpDialog.getTableAsync().then(function (oTable) {
                 oTable.setModel(oModel);
@@ -205,7 +229,6 @@ sap.ui.define(
     
         });
         oModel.setData(oData);
-        
         this._RoleValueHelpDialog.close();
     },
     
@@ -217,10 +240,58 @@ sap.ui.define(
     onRoleValueHelpAfterClose: function () {
         this._RoleValueHelpDialog.destroy();
     },
+    onRoleFilterBarSearch:function(oEvent){
+        var sSearchQuery = this._oRoleSearchField.getValue(),
+        aSelectionSet = oEvent.getParameter("selectionSet");
+    var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
+        if (oControl.getValue()) {
+            aResult.push(new Filter({
+                path: oControl.getName(),
+                operator: FilterOperator.Contains,
+                value1: oControl.getValue()
+            }));
+        }
+
+        return aResult;
+    }, []);
+
+    aFilters.push(new Filter({
+        filters: [
+            new Filter({ path: "Role", operator: FilterOperator.Contains, value1: sSearchQuery }),
+            new Filter({ path: "RoleDescription", operator: FilterOperator.Contains, value1: sSearchQuery }),
+        ],
+        and: false
+    }));
+
+    this._filterTable(new Filter({
+        filters: aFilters,
+        and: true
+    }));
+
+    },
+    _filterTable: function (oFilter) {
+        var oValueHelpDialog = this._RoleValueHelpDialog;
+
+        oValueHelpDialog.getTableAsync().then(function (oTable) {
+            if (oTable.bindRows) {
+                oTable.getBinding("rows").filter(oFilter);
+            }
+
+            if (oTable.bindItems) {
+                oTable.getBinding("items").filter(oFilter);
+            }
+
+            oValueHelpDialog.update();
+        });
+    },
     onOwnerValueHelpRequest: function() {
         var aCols = this.oColumnModel.getData().cols,
-         oModel=this.getView().getModel("mainModel"),
+         oModel=this.getOwnerComponent().getModel("OwnerValueHelpModel"),
          oMultiInput=this.getView().byId("ownerSelect");
+         this._oOwnerSearchField = new SearchField({
+            showSearchButton: false,
+            placeholder: "Search in both User and Full Name"
+        });
 
       Fragment.load({
             name: "zfiauthomatrix.view.OwnerValueHelpDialog",
@@ -228,6 +299,8 @@ sap.ui.define(
         }).then(function(oValueHelpDialog) {
             this._OwnerValueHelpDialog = oValueHelpDialog;
             this.getView().addDependent(this._OwnerValueHelpDialog);
+            var oFilterBar = this._OwnerValueHelpDialog.getFilterBar();
+            oFilterBar.setBasicSearch(this._oOwnerSearchField);
 
             this._OwnerValueHelpDialog.getTableAsync().then(function (oTable) {
                 oTable.setModel(oModel);
@@ -275,8 +348,52 @@ sap.ui.define(
     onOwnerValueHelpAfterClose: function () {
         this._OwnerValueHelpDialog.destroy();
     },
+    onOwnerFilterBarSearch:function(oEvent){
+        var sSearchQuery = this._oOwnerSearchField.getValue(),
+        aSelectionSet = oEvent.getParameter("selectionSet");
+    var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
+        if (oControl.getValue()) {
+            aResult.push(new Filter({
+                path: oControl.getName(),
+                operator: FilterOperator.Contains,
+                value1: oControl.getValue()
+            }));
+        }
+
+        return aResult;
+    }, []);
+
+    aFilters.push(new Filter({
+        filters: [
+            new Filter({ path: "UserName", operator: FilterOperator.Contains, value1: sSearchQuery }),
+            new Filter({ path: "FullName", operator: FilterOperator.Contains, value1: sSearchQuery }),
+        ],
+        and: false
+    }));
+
+    this._filterOwnerTable(new Filter({
+        filters: aFilters,
+        and: true
+    }));
+
+    },
+    _filterOwnerTable: function (oFilter) {
+        var oValueHelpDialog = this._OwnerValueHelpDialog;
+
+        oValueHelpDialog.getTableAsync().then(function (oTable) {
+            if (oTable.bindRows) {
+                oTable.getBinding("rows").filter(oFilter);
+            }
+
+            if (oTable.bindItems) {
+                oTable.getBinding("items").filter(oFilter);
+            }
+
+            oValueHelpDialog.update();
+        });
+    },
     
-    onPressNewRole:function(){
+    onPressNewRole:function(){        
     Fragment.load({
             name: "zfiauthomatrix.view.addNewEmployeeDialog",
             controller:this
@@ -285,7 +402,6 @@ sap.ui.define(
             this.getView().addDependent(this._addEmployeeDialog);
             this._addEmployeeDialog.open();
         }.bind(this));
-        
     },
     onEmployeeDialogClose:function(){
         this._addEmployeeDialog.close();
@@ -294,39 +410,54 @@ sap.ui.define(
         this._addEmployeeDialog.destroy();         
      },
      onAddNewEmployee:function(){
+
         var role    = this.getView().getModel("newRole").getProperty("/Role");
         var roleDescription   = this.getView().getModel("newRole").getProperty("/RoleDescription");
-        var amount    = this.getView().getModel("newRole").getProperty("/Amount");
+        var sAmount    = this.getView().getModel("newRole").getProperty("/Amount");
         var currency     = this.getView().getModel("newRole").getProperty("/Currency");
+        var oDialog= this._addEmployeeDialog;
 
         var dataToSend = {
             role: role,               
             roleDescription: roleDescription,
-            amount: amount,
+            amount: sAmount,
             currency: currency
         };
-        //  this.setBusy("newEmployeeDialog", true);
+          this.setBusy("newEmployeeDialog", true);          
+       service.create(dataToSend).then(function (oData) {
+         this.setBusy("newEmployeeDialog", false);
+         var msg = this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("messageForAddedRole");
+		 MessageToast.show(msg);
+         var closeFunction= function(){
+             
+             oDialog.close();
 
-       service.post(dataToSend).then(function (oData) {
-       //  this.setBusy("newEmployeeDialog", false);
-       //  this.onEmployeeDialogClose(sFragment);
-       //  this.setBusy("mainPageTable", true);
-      
+        };
+        window.setTimeout(closeFunction,1000);
          
-    //    service.get("/POAAuthMatrixSet",{
-    //          expand: "POAAuthHD2MatrixSet"
-    //      }).then(function (data) {
-    //          this.setJSONModel(data, "mainModel");
-    //          //this.setBusy("mainPageTable", false);
-    //      }.bind(this)).then(undefined, function(oError) {
-    //          this.showErrorMessage(oError);
-    //          //this.setBusy("mainPageTable", false);
-    //      }.bind(this));
-     
+
      }.bind(this)).then(undefined, function(oError) {
          this.showErrorMessage(oError);
-        // this.setBusy("newEmployeeDialog", false);
+         this.setBusy("newEmployeeDialog", false);
      }.bind(this));
+     },
+     onAmountInputEnter:function(oEvent){
+         var oInput= oEvent.getSource();
+        var oMessageProcessor = new sap.ui.core.message.ControlMessageProcessor();
+        var oMessageManager  = sap.ui.getCore().getMessageManager();
+
+        oMessageManager.registerObject(oInput, true);
+        
+        oMessageManager.registerMessageProcessor(oMessageProcessor);    
+        oMessageManager.addMessages(
+            new sap.ui.core.message.Message({
+                message: "Make sure to leave no space between numbers",
+                type: sap.ui.core.MessageType.Warning,
+                target: "amountInput/value",
+                processor: oMessageProcessor,
+                persistent: true
+             })
+        );
      },
      setBusy: function(sId, busy) {
         if (this.getView().byId(sId)) {
@@ -351,7 +482,6 @@ sap.ui.define(
                 name: "zfiauthomatrix.view.CurrencyValueHelpDialog",
                 controller: this
             }).then(function (oDialog){
-                oDialog.setModel(oView.getModel("newRole"),"roleDataModel");
                 oView.addDependent(oDialog);
                 return oDialog;
             });
@@ -440,7 +570,7 @@ sap.ui.define(
         };
         
 
-        if (Status) {
+        if (Status && Status!== "All") {
             arrayFilter.push(new Filter({
                    path: "Status",
                    operator: FilterOperator.EQ,
@@ -448,39 +578,67 @@ sap.ui.define(
                    
            }));
         };
-    
-       oBinding.filter(new Filter({
-        filters:arrayFilter,
-        and: true
-      }));
-     },
-     onClear:function(oEvent){
-    //   var aSelectionSet= oEvent.getParameters("selectionSet").selectionSet;
-    //   console.log(aSelectionSet);
-    //   aSelectionSet.forEach(function(filter){
-    //     var sId=filter.getId();
-    //     var oInput=  sap.ui.getCore().byId(sId);
-    //       if(sId!==){
-            
-    //         var sValue=oInput.getValue();
-    //         console.log(sValue);}
        
-    //   })
+        var aFiltersToSend= [];
+        aFiltersToSend.push(new Filter({
+            filters:arrayFilter,
+            and: true
+          }));
+        
+        this.getTableData(aFiltersToSend);
+    
+    //    oBinding.filter(new Filter({
+    //     filters:arrayFilter,
+    //     and: true
+    //   }));
+     },
+     onRoleInputChange:function(oEvent){
+        var aDeleatedToken= oEvent.getParameters("removedTokens").removedTokens,
+        sDeleatedToken= aDeleatedToken[0].getKey();
+        var oModel= this.getView().getModel("filterModel"),
+        oData = oModel.getData();
+        
+        for(var i=0 ; i<oData.role.length ; i++){
+            if(oData.role[i].key===sDeleatedToken){
+                oData.role.splice(i,1);
+            }
+        };
 
+       oModel.setData(oData);
+       
+     },
+    onOwnerInputChange:function(oEvent){
+        var aDeleatedToken= oEvent.getParameters("removedTokens").removedTokens,
+        sDeleatedToken= aDeleatedToken[0].getKey();
+        var oModel= this.getView().getModel("filterModel"),
+        oData = oModel.getData();
+        
+        for(var i=0 ; i<oData.owner.length ; i++){
+            if(oData.owner[i].key===sDeleatedToken){
+                oData.owner.splice(i,1);
+            }
+        };
+
+       oModel.setData(oData);
+        
+    },
+     onClear:function(oEvent){
+        var oModel= this.getView().getModel("filterModel");
+        var oData=oModel.getData();
+        oData.status="";
+        oData.owner=[];
+        oData.role=[];
+        oModel.setData(oData);
      },
      onListItemPressed:function(oEvent){
       var oModel= this.getView().getModel("mainModel");
       console.log(oModel);
      }
      ,
-            onPressEdit:function(){
-                var oRouter = this.getOwnerComponent().getRouter();
-                oRouter.navTo("RouteCreateView");
-            },
-
-     
-
-    
+    onPressEdit:function(){
+        var oRouter = this.getOwnerComponent().getRouter();
+        oRouter.navTo("RouteCreateView");
+    }
       });
     }
   );

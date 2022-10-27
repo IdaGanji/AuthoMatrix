@@ -1,0 +1,18 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="ownerSelectDialog"
+		title="Select Employee"
+		search=".onSelectDialogSearch"
+		confirm=".onSelectDialogClose"
+		cancel=".onSelectDialogClose"
+		items="{
+			path: 'OwnerValueHelpModel>/results'
+		}">
+		<StandardListItem
+			title="{OwnerValueHelpModel>UserName}"
+			description="{OwnerValueHelpModel>FullName}"
+			type="Active" />
+	</SelectDialog>
+</core:FragmentDefinition>

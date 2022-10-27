@@ -1,198 +1,118 @@
-<mvc:View
-		controllerName="zfiauthomatrix.controller.ChangeRole"
-		xmlns:mvc="sap.ui.core.mvc"
-		xmlns="sap.m"
-		xmlns:f="sap.f"
-		xmlns:layout="sap.ui.layout"
-        xmlns:fb="sap.ui.comp.filterbar"
-        xmlns:core="sap.ui.core"
-		height="100%"
-        displayBlock="true">
-		<f:DynamicPage id="mainPage" headerExpanded="{/headerExpanded}" toggleHeaderOnTitleClick="{/titleClickable}" showFooter="true">
-			<!-- DynamicPage Title -->
-			<f:title>
-				<f:DynamicPageTitle>
-					<f:heading>
-						<Title text="{i18n>title}"/>
-					</f:heading>
-					<f:breadcrumbs>
-						<Breadcrumbs>
-							<Link text="{i18n>furtherNav1}" />
-							<Link text="{i18n>furtherNav2}" />
-						</Breadcrumbs>
-					</f:breadcrumbs>
-					<!-- <f:expandedContent>
-						<Label text="This is a subheading"/>
-					</f:expandedContent>
-					<f:snappedContent>
-						<Label text="This is a subheading"/>
-					</f:snappedContent> -->
-					<!-- <f:snappedTitleOnMobile>
-						<Title text="This is a subheading"/>
-					</f:snappedTitleOnMobile> -->
-					<!-- <f:content>
-						<OverflowToolbar>
-							<GenericTag text="SR"
-								status="Error"
-								press="onPressOpenPopover"
-								design="StatusIconHidden">
-								<ObjectNumber number="2"
-									unit="M"
-									emphasized="false"
-									state="Error"/>
-							</GenericTag>
-						</OverflowToolbar>
-					</f:content> -->
-					<!-- <f:actions>
-						<Button
-								text="Edit"
-								type="Emphasized"
-								press="toggleAreaPriority"/>
-						<Button
-								text="Delete"
-								type="Transparent"/>
-						<Button
-								text="Copy"
-								type="Transparent"/>
-						<Button
-								text="Toggle Footer"
-								type="Transparent"
-								press="onToggleFooter"/>
-						<Button
-								icon="sap-icon://action"
-								type="Transparent"/>
-						<Button
-								text="Button with layoutData"
-								type="Transparent"
-								press="onPressOpenPopover">
-							<layoutData>
-								<OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
-							</layoutData>
-						</Button>
-					</f:actions> -->
-					<f:navigationActions>
-						<Button
-								icon="sap-icon://full-screen"
-								type="Transparent" />
-						<Button
-								icon="sap-icon://exit-full-screen"
-								type="Transparent" />
-						<Button
-								icon="sap-icon://decline"
-								type="Transparent" />
-					</f:navigationActions>
-				</f:DynamicPageTitle>
-			</f:title>
-			<!-- DynamicPage Header -->
-			<f:header>
-				<f:DynamicPageHeader pinnable="true">
-					<!-- <layout:HorizontalLayout allowWrapping="true"> -->
-                        
-                
-					<!-- </layout:HorizontalLayout> -->
-				</f:DynamicPageHeader>
-			</f:header>
-			<f:content>
-				<Table id="idTable"
-						sticky="HeaderToolbar,ColumnHeaders"
-						inset="false"
-						items="{
-							path: 'mainModel>/results',
+<mvc:View controllerName="zfiauthomatrix.controller.ChangeRole" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:uxap="sap.uxap" xmlns:f="sap.f" xmlns:layout="sap.ui.layout" xmlns:fb="sap.ui.comp.filterbar" xmlns:core="sap.ui.core" height="100%" displayBlock="true">
+<f:DynamicPage id="createRolePage" headerExpanded="{/headerExpanded}" toggleHeaderOnTitleClick="{/titleClickable}" showFooter="true">
+ <f:content>
+    <IconTabBar id="idIconTabBarMulti" expanded="true" class="sapUiLargeMargins">
+        <items>
+            <IconTabFilter icon="sap-icon://request" key="changeReq" text="Requests" class="sapUiLargeMargins" >
+                <Table id="idChangeTable" sticky="HeaderToolbar,ColumnHeaders" inset="false" class="sapFDynamicPageAlignContent" width="auto" mode="None" selectionChange="onItemsSelected" items="{
+							path: 'changeModel>/',
 							sorter: {
 								path: 'Role'
 							}
-						}"
-					   class="sapFDynamicPageAlignContent"
-					   width="auto"
-                       growing="true"
-                       growingThreshold="20"
-                       mode="MultiSelect"
-                       selectionChange="onItemsSelected"
-                       >
-					<!-- <headerToolbar>
-						<Toolbar>
-							<Title text="Products" level="H2"/>
-						</Toolbar>
-					</headerToolbar> -->
-					<columns>
-						<Column id="roleColumn">
-							<Text text="{i18n>role}" />
-						</Column>
-						<!-- <Column id="roleDescColumn" >
-							<Text text="{i18n>roleDes}" />
-						</Column> -->
-						<Column id="roleOwnerColumn">
-							<Text text="{i18n>roleOwner}" />
-						</Column>
-						<Column id="amountColumn">
-							<Text text="{i18n>amount}" />
-						</Column>
+						}">
+                    <columns>
+                        <Column id="roleColumn">
+                            <Text text="{i18n>role}" />
+                        </Column>
+                        <Column id="roleDescColumn">
+                            <Text text="{i18n>roleDes}" />
+                        </Column>
+                        <Column id="roleOwnerColumn">
+                            <Text text="{i18n>roleOwnerId}" />
+                        </Column>
+                        <Column id="roleOwnerFNameColumn">
+                            <Text text="{i18n>roleOwnerName}" />
+                        </Column>
+                        <Column id="amountColumn">
+                            <Text text="{i18n>amountCh}" />
+                        </Column>
                         <Column id="startDateColumn">
-							<Text text="{i18n>startDate}" />
-						</Column>
+                            <Text text="{i18n>startDate}" />
+                        </Column>
                         <Column id="endDateColumn">
-							<Text text="{i18n>endDate}" />
-						</Column>
+                            <Text text="{i18n>endDate}" />
+                        </Column>
                         <Column id="statusColumn">
-							<Text text="{i18n>status}" />
-						</Column>
-					</columns>
-					<items>
-						<ColumnListItem>
-							<cells>
-                                <!-- <Text
-                                        text="{mainModel>Role}" />
-								<Text
-										text="{mainModel>Roledescription}" /> -->
-                                <ObjectIdentifier title="{mainModel>Role}" text="{mainModel>Roledescription}"/>
-								<!-- <Text
-										text="{mainModel>Roleowner}" /> -->
-                                <ObjectIdentifier title="{mainModel>Roleowner}" text="{mainModel>RoleownerName}"/>
-								<ObjectNumber
-										number="{
-											parts:[{path:'mainModel>Maxamount'},{path:'mainModel>Currency'}],
-											type: 'sap.ui.model.type.Currency',
-											formatOptions: {showMeasure: false}
-										}"
-										unit="{mainModel>Currency}" />
-                                <ObjectNumber
-										number="{
-											path:'mainModel>Startdate',
+                            <Text text="{i18n>status}" />
+                        </Column>
+                        <Column id="plusColumn" width="3%" />
+                        <Column id="OrgRoleColumn" visible="false" width="1px">
+                            <Text text="{i18n>status}" />
+                        </Column>
+                        <Column id="OrgRoleownerColumn" visible="false" width="1px">
+                            <Text text="{i18n>status}" />
+                        </Column>
+                        <Column id="OrgStartdatestatusColumn" visible="false" width="1px">
+                            <Text text="{i18n>status}" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{changeModel>Role}" />
+                                <Input value="{changeModel>Roledescription}" />
+                                <Input  id="ownerSelectInput" value="{changeModel>Roleowner}" editable="false" showValueHelp="true" valueHelpRequest="onValueHelpRequest"/>
+                                <Input value="{changeModel>RoleownerName}" editable="false"/>
+                                <Input value="{changeModel>Maxamount}" />
+                                <DatePicker id="startDatePicker" value="{path:'changeModel>Startdate',
 											type: 'sap.ui.model.type.Date',
-											formatOptions: {pattern: 'yyyy-MM-dd'}
-										}" />
-                                <ObjectNumber
-										number="{
-											path:'mainModel>Enddate',
+											formatOptions: {pattern: 'dd/MM/yyyy', UTC: true}}" />
+                                <DatePicker id="endDatePicker" value="{path:'changeModel>Enddate',
 											type: 'sap.ui.model.type.Date',
-											formatOptions: {pattern: 'yyyy-MM-dd'}
-										}" /> 
-                                 <!-- <Text
-										text="{
-                                            path: 'mainModel>Status',
-                                            formatter: '.formatter.statusText'}" /> -->
+											formatOptions: {pattern: 'dd/MM/yyyy', UTC: true}}" />
+
                                 <ObjectStatus
-                                        text="{
-                                            path: 'mainModel>Status',
-                                            formatter: '.formatter.statusText'}"
-                                        icon="{
-                                            path: 'mainModel>Status',
-                                            formatter: '.formatter.statusIcon'}" 
-                                        state="{
-                                            path: 'mainModel>Status',
-                                            formatter: '.formatter.statusColor'}" />
-							</cells>
-						</ColumnListItem>
-					</items>
-				</Table>
-			</f:content>
-			<!-- DynamicPage Footer -->
+                                    text="{changeModel>Status}"
+                                    icon="{
+                                            path: 'changeModel>Status',
+                                            formatter: '.formatter.statusIcon'}"
+                                    state="{
+                                            path: 'changeModel>Status',
+                                            formatter: '.formatter.statusColor'}"
+                                />
+                                <Button icon="sap-icon://add" press="onDuplicatePress"  tooltip="Add role owner">
+                                </Button>
+
+                                <Text text="{changeModel>OrgRole}" />
+                                <Text text="{changeModel>OrgRoleowner}" />
+                                <Text text="{changeModel>OrgStartdate}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </IconTabFilter>
+            <IconTabSeparator icon=""/>
+            <IconTabFilter icon="sap-icon://comment" key="comments" class="sapUiLargeMargins" text="Comments">
+                <Panel backgroundDesign="Transparent" headerText="{i18n>ObjectCommentsTabTitle}" width="50%">
+                    <content>
+                        <FeedInput post=".onPost" />
+                        <List
+                            id="idCommentsList"
+                            noDataText="{i18n>ObjectCommentNoData}"
+                            showSeparators="Inner"
+                            items="{
+                                                path: 'commentModel>/EntryCollection'
+                                                
+                                            }"
+                        >
+                            <FeedListItem 
+                                 text="{commentModel>comment}"
+                                 sender="{commentModel>user}"
+                                 timestamp="{commentModel>date}" />
+                        </List>
+                    </content>
+                </Panel>
+            </IconTabFilter>
+        </items>
+    </IconTabBar>
+    </f:content>
+			
 			<f:footer>
 				<OverflowToolbar>
 					<ToolbarSpacer/>
-					<Button type="Emphasized" text="{i18n>createnewrole}" press=".onPressNewRole"/>
-					<Button type="Emphasized" text="{i18n>changeselectedroles}" press=".onPressEdit"/>
+                    <Button type="Emphasized" text="{i18n>submit}" press=".onPressSubmit"/>
 				</OverflowToolbar>
 			</f:footer>
 		</f:DynamicPage>
+
 </mvc:View>
